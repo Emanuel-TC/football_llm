@@ -16,7 +16,10 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
+
+      - name: Validar sintaxis JavaScript
+        run: node --check *.js
 
       - name: Instalar Clasp globalmente
         run: npm install -g @google/clasp
