@@ -64,8 +64,19 @@ function generarLeccionDiariaFutbol() {
   
   // 4. Guardar datos en Google Sheets
   if (verbosExtraidos.length > 0) {
-    Logger.log("🗄️ Base de Datos: Actualizando uso de verbos en Sheets...");
-    registrarVerbosUsados(verbosExtraidos);
+    // Filtrar para no seguir incrementando verbos que ya estaban prohibidos
+    const verbosValidos = verbosExtraidos.filter(v => {
+      if (verbosProhibidos.includes(v)) {
+        Logger.log(`⚠️ Advertencia: La IA intentó usar el verbo ya prohibido '${v}'. Se mantiene bloqueado.`);
+        return false;
+      }
+      return true;
+    });
+
+    if (verbosValidos.length > 0) {
+      Logger.log("🗄️ Base de Datos: Actualizando uso de verbos en Sheets...");
+      registrarVerbosUsados(verbosValidos);
+    }
   }
 
   if (temaExtraido || titularExtraido) {
