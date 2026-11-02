@@ -2,19 +2,23 @@
  * AGENTE 4 & EXPORTACIÓN: Validador con Groq y envío por correo con PDF
  */
 
-function generarValidadorGroq(textoLeccion) {
+function generarValidadorGroq(textoLeccion, solucionHuecos = []) {
   const url = 'https://api.groq.com/openai/v1/chat/completions';
-  
+
+  const guiaSolucion = (Array.isArray(solucionHuecos) && solucionHuecos.length === 5)
+    ? `\nSOLUCIÓN OFICIAL VERIFICADA PARA LA SECCIÓN 2 (Úsalas en este orden exacto):\n- Hueco 1: ${solucionHuecos[0]}\n- Hueco 2: ${solucionHuecos[1]}\n- Hueco 3: ${solucionHuecos[2]}\n- Hueco 4: ${solucionHuecos[3]}\n- Hueco 5: ${solucionHuecos[4]}\n`
+    : "";
+
   const prompt = `
   Eres un asistente educativo de élite y profesor de inglés. Acabo de generar este ejercicio de inglés A1 para mi hermano de 13 años. 
   
-  Tu tarea es leer el ejercicio y generar la hoja de respuestas oficiales y explicadas para las secciones 2, 3 y 5.
-  
+  Tu tarea es generar la hoja de respuestas oficiales y explicadas para las secciones 2, 3 y 5.
+  ${guiaSolucion}
   REGLAS CRÍTICAS PARA LA SECCIÓN 2 (READ & FILL IN THE BLANKS):
   1. El Word Bank tiene exactamente 5 palabras distintas (3 verbos, 1 adjetivo, 1 sustantivo).
   2. El texto narrativo contiene exactamente 5 huecos numerados del 1 al 5: [ ____________ ].
   3. CADA UNA DE LAS 5 PALABRAS DEL WORD BANK SE DEBE USAR EXACTAMENTE UNA VEZ.
-  4. ESTÁ TOTALMENTE PROHIBIDO REPETIR UNA PALABRA en dos huecos diferentes. Ninguna palabra puede repetirse. Las 5 respuestas de la sección 2 DEBEN ser las 5 palabras distintas del Word Bank.
+  4. ESTÁ TOTALMENTE PROHIBIDO REPETIR UNA PALABRA en dos huecos diferentes. Las 5 respuestas de la sección 2 DEBEN ser las 5 palabras distintas del Word Bank.
   5. Asigna cada una de las 5 palabras a su hueco correspondiente en orden de aparición (del 1 al 5).
   
   Para cada respuesta, agrega una explicación súper corta (1 o 2 líneas máximo) en español mexicano, con un tono amable, claro y motivador, para copiar y pegarle esa explicación por WhatsApp si se equivoca.
@@ -49,7 +53,7 @@ function generarValidadorGroq(textoLeccion) {
       { role: "system", content: "Eres un útil asistente de profesores estricto y preciso con las hojas de respuestas." },
       { role: "user", content: prompt }
     ],
-    temperature: 0.2 // Reducida a 0.2 para mayor precisión analítica
+    temperature: 0.2
   };
   
   const options = {

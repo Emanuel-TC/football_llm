@@ -37,7 +37,7 @@ function generarLeccionDiariaFutbol() {
     return;
   }
 
-  // 3. Extraer metadatos (Verbos y Tema)
+  // 3. Extraer metadatos (Verbos, Tema y Solución de Huecos)
   let verbosExtraidos = [];
   const regexVerbos = /(?:\[)?VERBOS_USADOS:\s*([^\]\n]+)(?:\])?/i;
   const matchVerbos = leccionCruda.match(regexVerbos);
@@ -52,6 +52,14 @@ function generarLeccionDiariaFutbol() {
     temaExtraido = matchTema[1].trim();
   }
 
+  // Extraer solución exacta de los huecos para el validador
+  let solucionHuecos = [];
+  const regexSolucion = /(?:\[)?SOLUCION_HUECOS:\s*([^\]\n]+)(?:\])?/i;
+  const matchSolucion = leccionCruda.match(regexSolucion);
+  if (matchSolucion) {
+    solucionHuecos = matchSolucion[1].split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+  }
+
   // Extraer el titular en inglés para registro en Sheets
   let titularExtraido = "";
   const matchTitular = leccionCruda.match(/⚽\s*(.+)/);
@@ -59,7 +67,7 @@ function generarLeccionDiariaFutbol() {
     titularExtraido = matchTitular[1].replace(/\[|\]/g, "").trim();
   }
 
-  // Limpiar la sección 7 de metadatos antes de exportar
+  // Limpiar la sección 7 de metadatos antes de exportar a Docs y PDF
   leccionCruda = leccionCruda.replace(/(?:⚙️\s*)?7\.\s*METADATOS OCULTOS[\s\S]*/i, "").trim();
   
   // 4. Guardar datos en Google Sheets
@@ -88,9 +96,9 @@ function generarLeccionDiariaFutbol() {
   Logger.log("🤖 Agente 3: Creando pestaña y escribiendo en Google Docs...");
   const idPestana = escribirNoticiaEnDoc(leccionCruda);
   
-  // 6. Agente 4: Generar respuestas con Groq
+  // 6. Agente 4: Generar respuestas con Groq (con la solución verificada)
   Logger.log("🤖 Agente 4 (Groq): Generando la hoja de respuestas...");
-  const validador = generarValidadorGroq(leccionCruda);
+  const validador = generarValidadorGroq(leccionCruda, solucionHuecos);
   
   // 7. Agente 5: Exportar a PDF y enviar correo
   Logger.log("🤖 Agente 5: Exportando a PDF y enviando correo...");
@@ -99,4 +107,3 @@ function generarLeccionDiariaFutbol() {
   
   Logger.log("🎉 ¡Proceso total completado con éxito!");
 }
-
