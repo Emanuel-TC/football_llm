@@ -1,5 +1,6 @@
 /**
  * CONFIGURACIÓN GLOBAL Y PROPIEDADES DEL SCRIPT
+ * Lee las credenciales y IDs almacenados en las Propiedades del Script de Google Apps Script.
  */
 const props = PropertiesService.getScriptProperties();
 
