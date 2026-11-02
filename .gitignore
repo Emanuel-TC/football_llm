@@ -1,0 +1,8 @@
+# Credenciales locales de clasp (¡No subir!)
+.clasprc.json
+
+# Configuración del proyecto de clasp
+.clasp.json
+
+# Dependencias de Node (si existieran)
+node_modules/
